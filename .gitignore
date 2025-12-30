@@ -1,0 +1,16 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+
+# Virtual environment
+Scripts/
+Lib/
+Include/
+share/
+pyvenv.cfg
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
