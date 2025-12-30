@@ -15,3 +15,7 @@ __pycache__/
 .DS_Store
 Thumbs.db
 .env
+
+# Temporary / runtime files
+temp.jpg
+etc/

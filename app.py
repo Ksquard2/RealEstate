@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from PIL import Image
 
-import ai_backend  # import the entire backend module
+import ai_backend  # backend module
 
 # ---------------------------------
 # Page Config
@@ -48,6 +48,51 @@ if uploaded_file:
             results = ai_backend.analyze_image(image_cv)
 
         st.success("Analysis complete!")
+    
+        # =============================
+        # DRAW BOUNDING BOXES
+        # =============================
+        scale = results["scale"]
+        image_with_boxes = image_cv.copy()
+
+        for det in results["detections"]:
+            x = int(det["x"] / scale)
+            y = int(det["y"] / scale)
+            w = int(det["width"] / scale)
+            h = int(det["height"] / scale)
+
+            # Convert center → corners
+            x1 = int(x - w / 2)
+            y1 = int(y - h / 2)
+            x2 = int(x + w / 2)
+            y2 = int(y + h / 2)
+
+            # Draw rectangle
+            cv2.rectangle(
+                image_with_boxes,
+                (x1, y1),
+                (x2, y2),
+                (0, 255, 0),
+                2
+            )
+
+            # Draw label
+            label = f"{det['label']} {det['confidence']:.2f}"
+            cv2.putText(
+                image_with_boxes,
+                label,
+                (x1, max(y1 - 10, 10)),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (0, 255, 0),
+                2
+            )
+
+        # Convert BGR → RGB for Streamlit
+        image_rgb = cv2.cvtColor(image_with_boxes, cv2.COLOR_BGR2RGB)
+
+        st.subheader("YOLOv8 Detections")
+        st.image(image_rgb, use_container_width=True)
 
         # ---------------------------------
         # Results Layout
@@ -58,23 +103,18 @@ if uploaded_file:
         with col1:
             st.subheader("Detected Objects")
 
-            if "detected_objects" in results:
-                for obj in results["detected_objects"]:
+            if results["detections"]:
+                for det in results["detections"]:
                     st.write(
-                        f"• **{obj['label']}** — {obj['confidence'] * 100:.1f}%"
+                        f"• **{det['label']}** — {det['confidence'] * 100:.1f}%"
                     )
             else:
                 st.info("No objects detected.")
 
-        # Measurements
+        # Measurements (placeholder for next step)
         with col2:
             st.subheader("Measurements")
-
-            if "measurements" in results:
-                for key, value in results["measurements"].items():
-                    st.write(f"• **{key}**: {value}")
-            else:
-                st.info("No measurements available.")
+            st.info("Measurement logic coming next.")
 
 else:
     st.info("Please upload an image to begin.")
