@@ -3,13 +3,14 @@ import os
 from roboflow import Roboflow
 import cv2
 
+
 load_dotenv()
 
 # -----------------------------
 # Roboflow Setup
 # -----------------------------
 api_key = os.getenv("ROBOFLOW_API_KEY")
-
+print(api_key)
 if not api_key:
     raise RuntimeError("ROBOFLOW_API_KEY not found")
 
